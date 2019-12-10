@@ -43,7 +43,7 @@ class DetectGlasses:
 
             self.focusEye(face, eyes[0], pad)
 
-    def calcPadding(self, w, h, wPct=0.35, hPct=0.33, split=1.1):
+    def calcPadding(self, w, h, wPct=0.30, hPct=0.20, split=1.1):
         '''
             Calculates padding around eye region based on face area size to reduce search area for eyeglasses.
             Since glasses usually will typically down below the eye instead of above, the height padding is split
