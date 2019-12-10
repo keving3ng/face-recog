@@ -1,12 +1,31 @@
-import numpy as np
+import argparse
+import os
+
 import cv2
+import numpy as np
 
 face_cascade = cv2.CascadeClassifier('data/cascades/haarcascade_frontalface_default.xml')
 eye_cascade = cv2.CascadeClassifier('data/cascades/haarcascade_eye_tree_eyeglasses.xml')
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--image', '-i', default=None, help='Image to process. If no image is given, then webcam will start.')
+
 class DetectGlasses:
-    def __init__(self):
-        self.show_webcam()
+    def __init__(self, arg_img):
+        if arg_img == None:
+            self.show_webcam()
+        if not os.path.exists(arg_img):
+            raise Exception("Path \"{}\" does not exist.".format(arg_img))
+        elif os.path.exists(arg_img):
+            img = cv2.imread(arg_img)
+            cv2.imshow('Image', img)
+            self.detectFace(img)
+            while True:
+                if cv2.waitKey(1) == 27: # ESC key to exit
+                    break
+            cv2.destroyAllWindows()
+        else:
+            exit()
 
     def focusEye(self, img, eyeLoc, pad):
         '''
@@ -19,6 +38,7 @@ class DetectGlasses:
             Returns:  None
             Raises:   None
         '''
+        print("Eyes Detected")
         x, y, w, h = eyeLoc
         wPad, hPadBot, hPadTop = pad
 
@@ -36,6 +56,7 @@ class DetectGlasses:
             Returns:  None
             Raises:   None
         '''
+        print("Detecting Eyes")
         eyes = eye_cascade.detectMultiScale(face, 1.3, 5)
         if len(eyes) > 0:
             x, y, w, h = eyes[0]
@@ -59,6 +80,7 @@ class DetectGlasses:
                 'face width padding', 'face height top padding', 'face height bottom padding'
             Raises:  None
         '''
+        print("Calculating padding")
         return int(w * wPct / 4), int(h * hPct / 2 * split), int(h * hPct / 2 * (1 - split))
 
     def detectFace(self, img):
@@ -71,6 +93,7 @@ class DetectGlasses:
             Returns:  None
             Raises:   None
         '''
+        print("Detecting face")
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         faces = face_cascade.detectMultiScale(gray, 1.3, 5)
         # For now, this is designed to work with one face
@@ -79,7 +102,7 @@ class DetectGlasses:
             face = img[y:y+h, x:x+w]
             self.detectEyes(face, self.calcPadding(w, h))
 
-    def show_webcam(self, ):
+    def show_webcam(self):
         '''
             This function loops to call functions to show webcam video and process the images.
 
@@ -87,10 +110,12 @@ class DetectGlasses:
             Returns:  None
             Raises:   None
         '''
+        print("Starting webcam")
         cam = cv2.VideoCapture(0)
 
         while True:
             ret_val, img = cam.read()
+            print(ret_val)
             img = cv2.flip(img, 1)
             self.detectFace(img)
 
@@ -103,4 +128,5 @@ class DetectGlasses:
         cv2.destroyAllWindows()
 
 if __name__ == '__main__':
-    DetectGlasses()
+    args = parser.parse_args()
+    DetectGlasses(args.image)
