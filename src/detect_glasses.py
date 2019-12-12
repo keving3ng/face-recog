@@ -30,7 +30,7 @@ class DetectGlasses:
             raise Exception("Path \"{}\" does not exist.".format(arg_img))
         elif os.path.exists(arg_img):
             img = cv2.imread(arg_img)
-            cv2.imshow('Image', img)
+            cv2.imshow('Main', img)
             self.detectFace(img)
             while True:
                 if cv2.waitKey(1) == 27: # ESC key to exit
@@ -76,7 +76,7 @@ class DetectGlasses:
 
             self.focusEye(face, eyes[0], pad)
 
-    def calcPadding(self, w, h, wPct=0.30, hPct=0.20, split=1.1):
+    def calcPadding(self, w, h, wPct=0.35, hPct=0.25, split=0.7):
         '''
             Calculates padding around eye region based on face area size to reduce search area for eyeglasses.
             Since glasses usually will typically down below the eye instead of above, the height padding is split
@@ -111,6 +111,9 @@ class DetectGlasses:
         # For now, this is designed to work with one face
         if len(faces) > 0:
             x, y, w, h = faces[0]
+            img = cv2.rectangle(img,(x,y),(x+w,y+h),(0,255,255))
+            cv2.putText(img, "Face: {}x{}".format(w, h), (x, y+h+15), cv2.FONT_HERSHEY_PLAIN, 1, (255,255,255), 1)
+            cv2.imshow('Main', img)
             face = img[y:y+h, x:x+w]
             self.detectEyes(face, self.calcPadding(w, h))
 
@@ -131,7 +134,7 @@ class DetectGlasses:
             img = cv2.flip(img, 1)
             self.detectFace(img)
 
-            cv2.imshow('Webcam Main', img)
+            cv2.imshow('Main', img)
 
             k = cv2.waitKey(1)
             if k == 27: # ESC key to exit
