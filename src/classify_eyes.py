@@ -14,9 +14,9 @@ train_dir = os.path.join(PATH, "train")
 validation_dir = os.path.join(PATH, "validation")
 
 train_glasses_dir = os.path.join(train_dir, "glasses")
-train_regular_dir = os.path.join(train_dir, "reg")
+train_regular_dir = os.path.join(train_dir, "regular")
 validation_glasses_dir = os.path.join(validation_dir, "glasses")
-validation_regular_dir = os.path.join(validation_dir, "reg")
+validation_regular_dir = os.path.join(validation_dir, "regular")
 
 
 print(len(os.listdir(train_glasses_dir)))
