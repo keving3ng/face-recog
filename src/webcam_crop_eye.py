@@ -84,7 +84,7 @@ class DetectGlasses:
             Raises:   None
         '''
         if self.LOG_LEVEL > 1: print("{} Detecting Eyes".format(timestamp()))
-        eyes = eye_cascade.detectMultiScale(face, 1.05, 4)
+        eyes = eye_cascade.detectMultiScale(face, 1.05, 3)
         if len(eyes) > 0:
             x, y, w, h = eyes[0]
             face = cv2.rectangle(face,(x,y),(x+w,y+h),(0,0,255),2)

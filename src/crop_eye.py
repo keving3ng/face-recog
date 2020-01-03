@@ -1,18 +1,4 @@
 #!env/bin/python
-"""
-This class is used to detect an eye from either a continuous video input, or a still image. 
-It uses OpenCV and haarcascades to identify a face and then find an eye on the face. 
-
-Usage:
-    Webcam:
-        $ crop_eye.py
-
-    Image:
-        $ crop_eye.py -i /path/to/image
-
-To exit, press 'ESC'
-"""
-
 import argparse
 import os
 import datetime
