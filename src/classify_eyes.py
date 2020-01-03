@@ -1,12 +1,14 @@
+#!env/bin/python
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
+import cv2
 import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from crop_eye import DetectGlasses
+from crop_eye import focusEye
 
 PATH = "./data/glasses"
 train_dir = os.path.join(PATH, "train")
@@ -14,19 +16,14 @@ validation_dir = os.path.join(PATH, "validation")
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-# train_glasses_dir = os.path.join(train_dir, "glasses")
-# train_regular_dir = os.path.join(train_dir, "regular")
-# validation_glasses_dir = os.path.join(validation_dir, "glasses")
-# validation_regular_dir = os.path.join(validation_dir, "regular")
-
 def trainModel():
-	# Rescale all images by 1./255
-	train_datagen = ImageDataGenerator(rescale=1/255)
+	# Rescale all images by 1./255 and preprocess to only have eye
+	train_datagen = ImageDataGenerator(preprocessing_function=focusEye, rescale=1/255)
 
 	train_generator = train_datagen.flow_from_directory(
 		train_dir,
 		target_size=(32, 32),
-		batch_size=1,
+		batch_size=10,
 		class_mode='binary'
 	)
 
