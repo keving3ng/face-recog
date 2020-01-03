@@ -1,3 +1,18 @@
+#!env/bin/python
+"""
+This class is used to detect an eye from either a continuous video input, or a still image. 
+It uses OpenCV and haarcascades to identify a face and then find an eye on the face. 
+
+Usage:
+    Webcam:
+        $ crop_eye.py
+
+    Image:
+        $ crop_eye.py -i /path/to/image
+
+To exit, press 'ESC'
+"""
+
 import argparse
 import os
 import datetime
@@ -76,7 +91,7 @@ class DetectGlasses:
 
             self.focusEye(face, eyes[0], pad)
 
-    def calcPadding(self, w, h, wPct=0.35, hPct=0.25, split=0.7):
+    def calcPadding(self, w, h, wPct=0.45, hPct=0.35, split=0.7):
         '''
             Calculates padding around eye region based on face area size to reduce search area for eyeglasses.
             Since glasses usually will typically down below the eye instead of above, the height padding is split
