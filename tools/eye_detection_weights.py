@@ -51,8 +51,7 @@ def focusEye(path, faceScale, faceNB, eyeScale, eyeNB):
         
     return faceFound, eyeFound
 
-def find_weights():
-    path = "/home/kgeng/code/face-recog/data/glasses/train/glasses"
+def find_weights(path):
     eyesFound = 0
     best = {'eyes': 0, 'es':0, 'en':0}
     scales = [1.05, 1.10, 1.15, 1.20, 1.25, 1.30, 1.35, 1.40]
@@ -64,7 +63,7 @@ def find_weights():
                 face, eye = focusEye(os.path.join(path,f), 1.1, 3, eyeScale, eyeNB)
                 eyesFound += eye
             ePerc = eyesFound / len(os.listdir(path)) * 100
-            print("eye: {}, {}, acc: eye={}%".format(eyeScale, eyeNB, ePerc))
+            #print("eye: {}, {}, acc: eye={}%".format(eyeScale, eyeNB, ePerc))
             if eyesFound > best.get('eyes'):
                 best['eyes'] = eyesFound
                 best['es'] = eyeScale
@@ -72,6 +71,14 @@ def find_weights():
             
             facesFound = 0
             eyesFound = 0
-    print(best)
+    print(path + " -> " + str(best['eyes'] / len(os.listdir(path)) * 100) + "% : " + str(best['es']) + ", " + str(best['en']))
+
 if __name__ == "__main__":
-    find_weights()
+    paths = [
+        "/home/kgeng/code/face-recog/data/glasses/train/glasses",
+        "/home/kgeng/code/face-recog/data/glasses/validation/glasses",
+        "/home/kgeng/code/face-recog/data/glasses/train/regular",
+        "/home/kgeng/code/face-recog/data/glasses/validation/regular"
+    ]
+    for path in paths:
+        find_weights(path)
