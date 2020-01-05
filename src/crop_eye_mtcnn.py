@@ -17,19 +17,63 @@
 """
 
 import cv2
+import os
 from mtcnn.mtcnn import MTCNN 
 
-image_path = "/home/kgeng/code/face-recog/data/glasses/train/glasses/TG0000.png"
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-detector = MTCNN()
+def calcPadding(w, h, wPct=0.75, hPct=0.80, split=0.55):
+    '''
+        Calculates padding around eye region based on face area size to reduce search area for eyeglasses.
+        Since glasses usually will typically down below the eye instead of above, the height padding is split
+        unevenly over the top and bottom
 
-img = cv2.imread(image_path)
-result = detector.detect_faces(img)
+        Args:
+            w       (int): width of face
+            h       (int): height of face
+            wPct  (float): ratio to scale the width padding. Approximate percentage of glasses coverage of face of ONE eye
+            hPct  (float): see above, but for height on face.
+            split (float): split of top/bottom padding of eye region
+        Returns:
+            'face width padding', 'face height top padding', 'face height bottom padding'
+        Raises:  None
+    '''
+    return int(w * wPct / 4), int(h * hPct / 2 * split), int(h * hPct / 2 * (1 - split))
 
-print(result)
-keypoints = result[0]['keypoints']
-cv2.circle(img,(keypoints['left_eye']), 2, (0,155,255), 2)
-cv2.circle(img,(keypoints['right_eye']), 2, (0,155,255), 2)
-cv2.namedWindow("image")
-cv2.imshow("image",img)
-cv2.waitKey(0)
+def find_eye(img, debug=False):
+    detector = MTCNN()
+
+    result = detector.detect_faces(img)
+    
+    if result:
+        keypoints = result[0]['keypoints']
+        bounding_box = result[0]['box']
+        eye = keypoints['left_eye']
+        wPad, hPadBot, hPadTop = calcPadding(bounding_box[3], bounding_box[2])
+
+        # Crop the eye and return it
+        eyeCropped = img[(eye[0] - wPad, eye[1] + hPadBot), (eye[0] + wPad, eye[1] - hPadTop)]
+
+        if debug:  
+            # Eye Box
+            cv2.rectangle(img,
+                (eye[0] - wPad, eye[1] + hPadBot),
+                (eye[0] + wPad, eye[1] - hPadTop),
+                (0,155,255),
+                2)
+
+            # Face Box
+            cv2.rectangle(img,
+                (bounding_box[0], bounding_box[1]),
+                (bounding_box[0]+bounding_box[2], bounding_box[1] + bounding_box[3]),
+                (155,0,0),
+                2)
+
+            cv2.imshow('test', img)
+            cv2.waitKey(0)
+        
+        return eyeCropped
+
+if __name__ == "__main__":
+    img = cv2.imread("./data/glasses/train/glasses/TG0024.png")
+    find_eye(img)
