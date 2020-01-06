@@ -40,7 +40,7 @@ def calcPadding(w, h, wPct=0.75, hPct=0.80, split=0.55):
     '''
     return int(w * wPct / 4), int(h * hPct / 2 * split), int(h * hPct / 2 * (1 - split))
 
-def find_eye(img, debug=False):
+def find_eye(img, debug=True):
     detector = MTCNN()
 
     result = detector.detect_faces(img)
@@ -52,7 +52,7 @@ def find_eye(img, debug=False):
         wPad, hPadBot, hPadTop = calcPadding(bounding_box[3], bounding_box[2])
 
         # Crop the eye and return it
-        eyeCropped = img[(eye[0] - wPad, eye[1] + hPadBot), (eye[0] + wPad, eye[1] - hPadTop)]
+        eyeCropped = img[eye[1] - hPadTop:eye[1] + hPadBot, eye[0] - wPad:eye[0] + wPad]
 
         if debug:  
             # Eye Box

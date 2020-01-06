@@ -8,17 +8,17 @@ import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from crop_eye import focusEye
+from crop_eye_mtcnn import find_eye
 
-PATH = "./data/glasses"
-train_dir = os.path.join(PATH, "train")
-validation_dir = os.path.join(PATH, "validation")
+DATA_PATH = "./data/glasses"
+train_dir = os.path.join(DATA_PATH, "train")
+validation_dir = os.path.join(DATA_PATH, "validation")
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 def trainModel():
 	# Rescale all images by 1./255 and preprocess to only have eye
-	train_datagen = ImageDataGenerator(preprocessing_function=focusEye, rescale=1/255)
+	train_datagen = ImageDataGenerator(preprocessing_function=find_eye, rescale=1/255)
 
 	train_generator = train_datagen.flow_from_directory(
 		train_dir,
