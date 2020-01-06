@@ -16,16 +16,13 @@ validation_dir = os.path.join(DATA_PATH, "validation")
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-def trainModel():
-	# Rescale all images by 1./255 and preprocess to only have eye
-	train_datagen = ImageDataGenerator(preprocessing_function=find_eye, rescale=1/255)
+class trainCallback(tf.keras.callbacks.Callback):
+	def on_epoch_end(self, epoch, logs={}):
+		if(logs.get['acc'] >= 0.95):
+			self.model.stop_training = True
 
-	train_generator = train_datagen.flow_from_directory(
-		train_dir,
-		target_size=(32, 32),
-		batch_size=10,
-		class_mode='binary'
-	)
+def trainModel():
+	
 
 	model = tf.keras.models.Sequential([
 		tf.keras.layers.Conv2D(16, (3, 3), activation='relu', input_shape=(32, 32, 3)),
