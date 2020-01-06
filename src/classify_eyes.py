@@ -8,7 +8,7 @@ import tensorflow as tf
 from tensorflow.keras.optimizers import RMSprop
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-from crop_eye_mtcnn import find_eye
+from crop_eye import find_eye
 
 DATA_PATH = "./data/glasses"
 train_dir = os.path.join(DATA_PATH, "train")

@@ -1,15 +1,28 @@
 #!env/bin/python
-import argparse
-import os
-import datetime
+"""
+    Result Example:
+        [
+            {
+                'box': [32, 25, 71, 95],
+                'confidence': 0.9514315128326416, 
+                'keypoints': {
+                    'left_eye': (42, 60), 
+                    'right_eye': (77, 60), 
+                    'nose': (56, 85), 
+                    'mouth_left': (46, 100), 
+                    'mouth_right': (74, 100)
+                }
+            }
+        ]
+"""
 
 import cv2
-import numpy as np
+import os
+from mtcnn.mtcnn import MTCNN 
 
-face_cascade = cv2.CascadeClassifier('data/cascades/haarcascade_frontalface_default.xml')
-eye_cascade = cv2.CascadeClassifier('data/cascades/haarcascade_eye_tree_eyeglasses.xml')
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-def calcPadding(w, h, wPct=0.45, hPct=0.35, split=0.7):
+def calcPadding(w, h, wPct=0.75, hPct=0.80, split=0.55):
     '''
         Calculates padding around eye region based on face area size to reduce search area for eyeglasses.
         Since glasses usually will typically down below the eye instead of above, the height padding is split
@@ -27,33 +40,40 @@ def calcPadding(w, h, wPct=0.45, hPct=0.35, split=0.7):
     '''
     return int(w * wPct / 4), int(h * hPct / 2 * split), int(h * hPct / 2 * (1 - split))
 
-def focusEye(img):
-    # Convert img to grayscale and detect face using haar'
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+def find_eye(img, debug=True):
+    detector = MTCNN()
 
-    # Raise exception if no faces are found
-    if len(faces) < 1:
-        raise Exception("No faces found")
+    result = detector.detect_faces(img)
     
-    # Store the location of the face and crop the image according to the dimensions and location
-    fx, fy, fw, fh = faces[0]
-    face = img[fy:fy+fh, fx:fx+fw]
+    if result:
+        keypoints = result[0]['keypoints']
+        bounding_box = result[0]['box']
+        eye = keypoints['left_eye']
+        wPad, hPadBot, hPadTop = calcPadding(bounding_box[3], bounding_box[2])
 
-    # Detect eyes on the face
-    eyes = eye_cascade.detectMultiScale(face, 1.3, 5)
+        # Crop the eye and return it
+        eyeCropped = img[eye[1] - hPadTop:eye[1] + hPadBot, eye[0] - wPad:eye[0] + wPad]
 
-    # Raise exception if no eyes found
-    if len(eyes) < 1:
-        raise Exception("No eyes found")
-    
-    # Store the location and dimension of one (1) eye
-    ex, ey, ew, eh = eyes[0]
+        if debug:  
+            # Eye Box
+            cv2.rectangle(img,
+                (eye[0] - wPad, eye[1] + hPadBot),
+                (eye[0] + wPad, eye[1] - hPadTop),
+                (0,155,255),
+                2)
 
-    # Calculate the crop padding around the eye for where eyeglasses would be
-    wPad, hPadBot, hPadTop = calcPadding(ew, eh)
-    
-    # Crop the eye and return it
-    eyeCropped = img[ey-hPadTop:ey+eh+hPadBot, ex-wPad:ex+ew+wPad]
-    print("{}w x {}h".format(ew, eh))
-    return eyeCropped
+            # Face Box
+            cv2.rectangle(img,
+                (bounding_box[0], bounding_box[1]),
+                (bounding_box[0]+bounding_box[2], bounding_box[1] + bounding_box[3]),
+                (155,0,0),
+                2)
+
+            cv2.imshow('test', img)
+            cv2.waitKey(0)
+        
+        return eyeCropped
+
+if __name__ == "__main__":
+    img = cv2.imread("./data/glasses/train/glasses/TG0024.png")
+    find_eye(img)
