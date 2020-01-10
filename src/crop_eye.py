@@ -48,12 +48,14 @@ def find_eye(img):
         keypoints = result[0]['keypoints']
         bounding_box = result[0]['box']
         eye = keypoints['left_eye']
+        print("img is {}x{}".format(bounding_box[3], bounding_box[2]))
         wPad, hPadBot, hPadTop = calcPadding(bounding_box[3], bounding_box[2])
 
         # Crop the eye and return it
         eyeCropped = img[eye[1] - hPadTop:eye[1] + hPadBot, eye[0] - wPad:eye[0] + wPad]
+        print(eyeCropped)
         return eyeCropped # Returns as np array
 
 if __name__ == "__main__":
-    img = cv2.imread("./data/glasses/train/glasses/TG0024.png")
+    img = cv2.imread("./data/glasses-detection/train/glasses/TG0027.png")
     find_eye(img)
