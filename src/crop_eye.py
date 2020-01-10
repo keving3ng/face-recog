@@ -40,9 +40,8 @@ def calcPadding(w, h, wPct=0.75, hPct=0.80, split=0.55):
     '''
     return int(w * wPct / 4), int(h * hPct / 2 * split), int(h * hPct / 2 * (1 - split))
 
-def find_eye(img, debug=True):
+def find_eye(img):
     detector = MTCNN()
-
     result = detector.detect_faces(img)
     
     if result:
@@ -53,26 +52,7 @@ def find_eye(img, debug=True):
 
         # Crop the eye and return it
         eyeCropped = img[eye[1] - hPadTop:eye[1] + hPadBot, eye[0] - wPad:eye[0] + wPad]
-
-        if debug:  
-            # Eye Box
-            cv2.rectangle(img,
-                (eye[0] - wPad, eye[1] + hPadBot),
-                (eye[0] + wPad, eye[1] - hPadTop),
-                (0,155,255),
-                2)
-
-            # Face Box
-            cv2.rectangle(img,
-                (bounding_box[0], bounding_box[1]),
-                (bounding_box[0]+bounding_box[2], bounding_box[1] + bounding_box[3]),
-                (155,0,0),
-                2)
-
-            cv2.imshow('test', img)
-            cv2.waitKey(0)
-        
-        return eyeCropped
+        return eyeCropped # Returns as np array
 
 if __name__ == "__main__":
     img = cv2.imread("./data/glasses/train/glasses/TG0024.png")
