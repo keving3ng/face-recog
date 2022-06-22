@@ -54,7 +54,7 @@ mccabe==0.6.1
 monotonic==1.5
 mtcnn==0.1.0
 netifaces==0.10.4
-numpy==1.21.0
+numpy==1.22.0
 oauthlib==3.1.0
 olefile==0.46
 opencv-python==4.2.0.32
