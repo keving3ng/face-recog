@@ -113,6 +113,6 @@ virtualenv==16.7.9
 virtualenv-clone==0.5.3
 virtualenvwrapper==4.8.4
 wadllib==1.3.3
-Werkzeug==0.16.0
+Werkzeug==2.2.3
 wrapt==1.11.2
 xkit==0.0.0
